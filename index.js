@@ -12,7 +12,7 @@ const htmlContent = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gartic v7.0 Modes</title>
+    <title>Gartic v7.1 Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
     <style>
@@ -29,17 +29,17 @@ const htmlContent = `
         /* HEADER */
         #gameHeader {
             position: fixed; top: 0; left: 0; width: 100%; height: 50px;
-            background: rgba(255,255,255,0.9); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            background: rgba(255,255,255,0.95); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
             z-index: 2000; font-weight: bold;
         }
         .timer-badge { background: var(--warn); color: white; padding: 4px 10px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; }
 
         /* PANELS */
         .panel {
-            background: var(--glass); padding: 25px; border-radius: 30px;
+            background: var(--glass); padding: 20px; border-radius: 25px;
             box-shadow: var(--shadow); text-align: center; width: 95%; max-width: 500px;
-            display: flex; flex-direction: column; gap: 10px; max-height: 85vh; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow-y: auto;
             position: relative; z-index: 10;
         }
         .btn {
@@ -52,52 +52,44 @@ const htmlContent = `
         .btn-accent { background: var(--accent); box-shadow: 0 4px 0 #00a884; }
         .btn-warn { background: var(--warn); box-shadow: 0 4px 0 #d63031; }
         .input-std { padding: 10px; border-radius: 12px; border: 2px solid #ddd; width: 100%; font-weight: bold; }
-        
-        /* LAYOUT FOR DRAW SCREEN (PALETTE LEFT, CANVAS RIGHT) */
+
+        /* DRAW LAYOUT */
         .game-layout {
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px;
-            width: 95vw; max-width: 1200px; height: 75vh;
+            width: 98vw; max-width: 1200px; height: 75vh;
         }
-
-        /* PALETTE (LEFT SIDE) */
         .palette-side {
-            display: flex; flex-direction: column; gap: 5px; background: white; padding: 8px;
-            border-radius: 15px; box-shadow: var(--shadow); height: 100%; justify-content: center;
+            display: flex; flex-direction: column; gap: 5px; background: white; padding: 5px;
+            border-radius: 15px; box-shadow: var(--shadow); height: 100%; justify-content: center; overflow-y: auto;
         }
-        .color-dot { 
-            width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; 
-        }
-        .color-dot:hover { transform: scale(1.1); }
-        .color-dot.active { transform: scale(1.2); border-color: #333; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-
-        /* CANVAS */
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
+        .color-dot.active { transform: scale(1.2); border-color: #333; }
         .canvas-wrapper {
             position: relative; border-radius: 15px; overflow: hidden;
             box-shadow: var(--shadow); background: white;
-            flex-grow: 1; height: 100%; aspect-ratio: 16/9; cursor: crosshair;
-            touch-action: none;
+            flex-grow: 1; height: 100%; aspect-ratio: 16/9; cursor: crosshair; touch-action: none;
         }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* BOTTOM TOOLBAR */
+        /* TOOLBAR */
         .toolbar {
-            background: white; padding: 8px 15px; border-radius: 20px; box-shadow: var(--shadow);
-            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;
-            margin-top: 10px; z-index: 100;
+            background: white; padding: 8px; border-radius: 20px; box-shadow: var(--shadow);
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center;
+            margin-top: 5px; z-index: 100;
         }
         .tool-btn {
-            width: 45px; height: 45px; border-radius: 12px; border: none; background: #f0f2f5;
-            font-size: 1.4rem; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            width: 40px; height: 40px; border-radius: 10px; border: none; background: #f0f2f5;
+            font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center;
         }
         .tool-btn.active { background: var(--primary); color: white; transform: scale(1.1); }
-        
+
         /* GHOST */
         #ghostElem {
             position: fixed; pointer-events: none; opacity: 0.7; z-index: 9999;
             transform-origin: center center; display: none; white-space: nowrap; font-family: 'Nunito'; font-weight: 900;
         }
 
-        /* CHAT/RESULTS */
+        /* CHAT */
         #presContainer { width: 100%; height: 50vh; background: rgba(255,255,255,0.7); border-radius: 15px; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .msg { max-width: 90%; padding: 8px 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .msg-info { align-self: center; background: var(--accent); color: white; }
@@ -108,11 +100,11 @@ const htmlContent = `
 </head>
 <body>
 
-    <!-- HEADER -->
+    <!-- HEADER (Visible inside game) -->
     <div id="gameHeader" class="hidden">
-        <div>
-            <button class="btn btn-warn" style="padding:5px 15px; width:auto; font-size:0.9rem" onclick="leaveRoom()">🚪 Выйти</button>
-            <button class="btn" style="padding:5px 15px; width:auto; font-size:0.9rem; background:#0984e3" onclick="copyLink()">🔗</button>
+        <div style="display:flex; gap:10px">
+            <button class="btn btn-warn" style="padding:5px 15px; width:auto; font-size:0.9rem; margin:0" onclick="leaveRoom()">🚪 ВЫЙТИ</button>
+            <button class="btn" style="padding:5px 15px; width:auto; font-size:0.9rem; margin:0; background:#0984e3" onclick="copyLink()">🔗 COPY</button>
         </div>
         <div>
             <span id="lblReadyCount" style="color:var(--accent); margin-right:10px; font-size:0.9rem"></span>
@@ -125,7 +117,7 @@ const htmlContent = `
 
     <!-- 1. LOGIN -->
     <div id="screenLogin" class="panel">
-        <h1>Gartic <span style="color:var(--accent)">v7.0</span></h1>
+        <h1>Gartic <span style="color:var(--accent)">v7.1</span></h1>
         <input id="inpName" class="input-std" placeholder="Никнейм" maxlength="12">
         <input id="inpRoom" class="input-std" placeholder="ID Комнаты" maxlength="10">
         <button class="btn" onclick="join()">ВОЙТИ</button>
@@ -138,9 +130,9 @@ const htmlContent = `
         
         <div id="hostArea" class="hidden" style="border-top: 2px solid #eee; padding-top: 10px; width:100%; text-align:left">
             <label><b>Режим игры:</b></label>
-            <select id="selGameMode" class="input-std" onchange="updSet('mode', this.value)" style="margin-bottom:10px">
+            <select id="selGameMode" class="input-std" onchange="updSet('mode', this.value)" style="margin-bottom:5px">
                 <option value="std">🎨 Стандарт (Текст - Рисунок)</option>
-                <option value="story">📜 История (Только текст, 2x длиннее)</option>
+                <option value="story">📜 История (Только текст, 2x шагов)</option>
             </select>
 
             <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
@@ -150,16 +142,25 @@ const htmlContent = `
             <input type="range" min="30" max="180" step="10" value="60" oninput="updSet('write', this.value)" style="width:100%">
             <input type="range" min="60" max="300" step="10" value="120" oninput="updSet('draw', this.value)" style="width:100%">
             
+            <p style="margin:5px 0 0 0; font-size:0.9rem">Длительность: <b id="valPerc">100%</b></p>
+            <input type="range" min="50" max="300" step="50" value="100" oninput="updSet('mod', this.value)" style="width:100%">
+            
             <button class="btn btn-accent" style="margin-top:10px" onclick="startGame()">НАЧАТЬ ИГРУ</button>
         </div>
         <p id="waitMsg" class="hidden">Ждем хоста...</p>
+        
+        <!-- BIG BUTTONS FOR LOBBY -->
+        <div style="display:flex; gap:10px; margin-top:10px">
+            <button class="btn btn-warn" onclick="leaveRoom()">🚪 ВЫЙТИ</button>
+            <button class="btn" style="background:#0984e3" onclick="copyLink()">🔗 ССЫЛКА</button>
+        </div>
     </div>
 
     <!-- SPECTATOR -->
     <div id="screenSpec" class="panel hidden">
         <h2>Идет игра...</h2>
-        <p>Вы наблюдатель. Дождитесь окончания.</p>
-        <button class="btn btn-warn" onclick="leaveRoom()">Выйти</button>
+        <p>Вы наблюдатель.</p>
+        <button class="btn btn-warn" onclick="leaveRoom()">ВЫЙТИ ИЗ КОМНАТЫ</button>
     </div>
 
     <!-- 3. TEXT ROUND -->
@@ -173,25 +174,24 @@ const htmlContent = `
 
     <!-- 4. DRAW ROUND -->
     <div id="screenDraw" class="hidden" style="width:100vw; height:100vh; flex-direction:column; align-items:center; justify-content:center; padding-top:50px">
-        
         <div style="background:white; padding:5px 20px; border-radius:20px; margin-bottom:5px; box-shadow:0 3px 6px rgba(0,0,0,0.1); font-weight:bold; z-index:100">
-            <span id="lblPrompt">Рисуй!</span>
+            <span id="lblPrompt">...</span>
         </div>
 
         <div class="game-layout">
-            <!-- LEFT PALETTE (12 Colors) -->
+            <!-- PALETTE LEFT -->
             <div class="palette-side">
                 <div class="color-dot active" style="background:#000000" onclick="setColor('#000000', this)"></div>
                 <div class="color-dot" style="background:#555555" onclick="setColor('#555555', this)"></div>
-                <div class="color-dot" style="background:#d63031" onclick="setColor('#d63031', this)"></div> <!-- Red -->
-                <div class="color-dot" style="background:#e17055" onclick="setColor('#e17055', this)"></div> <!-- Orange -->
-                <div class="color-dot" style="background:#fdcb6e" onclick="setColor('#fdcb6e', this)"></div> <!-- Yellow -->
-                <div class="color-dot" style="background:#00b894" onclick="setColor('#00b894', this)"></div> <!-- Green -->
-                <div class="color-dot" style="background:#0984e3" onclick="setColor('#0984e3', this)"></div> <!-- Blue -->
-                <div class="color-dot" style="background:#74b9ff" onclick="setColor('#74b9ff', this)"></div> <!-- Cyan -->
-                <div class="color-dot" style="background:#6c5ce7" onclick="setColor('#6c5ce7', this)"></div> <!-- Purple -->
-                <div class="color-dot" style="background:#e84393" onclick="setColor('#e84393', this)"></div> <!-- Pink -->
-                <div class="color-dot" style="background:#634c46" onclick="setColor('#634c46', this)"></div> <!-- Brown -->
+                <div class="color-dot" style="background:#d63031" onclick="setColor('#d63031', this)"></div>
+                <div class="color-dot" style="background:#e17055" onclick="setColor('#e17055', this)"></div>
+                <div class="color-dot" style="background:#fdcb6e" onclick="setColor('#fdcb6e', this)"></div>
+                <div class="color-dot" style="background:#00b894" onclick="setColor('#00b894', this)"></div>
+                <div class="color-dot" style="background:#0984e3" onclick="setColor('#0984e3', this)"></div>
+                <div class="color-dot" style="background:#74b9ff" onclick="setColor('#74b9ff', this)"></div>
+                <div class="color-dot" style="background:#6c5ce7" onclick="setColor('#6c5ce7', this)"></div>
+                <div class="color-dot" style="background:#e84393" onclick="setColor('#e84393', this)"></div>
+                <div class="color-dot" style="background:#634c46" onclick="setColor('#634c46', this)"></div>
                 <div class="color-dot" style="background:#ffffff; border:1px solid #ccc" onclick="setColor('#ffffff', this)"></div>
             </div>
 
@@ -203,30 +203,26 @@ const htmlContent = `
         <!-- TOOLBAR -->
         <div class="toolbar">
             <button class="tool-btn active" onclick="setTool('brush', this)">🖌️</button>
-            <input type="range" title="Толщина" min="1" max="50" value="5" style="width:60px" oninput="brushSize=parseInt(this.value)">
+            <input type="range" min="1" max="50" value="5" style="width:60px" oninput="brushSize=parseInt(this.value)">
             
-            <button class="tool-btn" onclick="setTool('fill', this)" title="Заливка фона">🪣</button>
-            
-            <!-- Shapes -->
-            <button class="tool-btn" onclick="setTool('rect', this)" title="Квадрат">⬜</button>
-            <button class="tool-btn" onclick="setTool('circle', this)" title="Круг">⚪</button>
+            <button class="tool-btn" onclick="setTool('fill', this)">🪣</button>
+            <button class="tool-btn" onclick="setTool('rect', this)">⬜</button>
+            <button class="tool-btn" onclick="setTool('circle', this)">⚪</button>
             <label style="display:flex; align-items:center; font-size:0.8rem; cursor:pointer; gap:3px">
-                <input type="checkbox" id="chkFillShape" style="width:16px; height:16px"> Заливка
+                <input type="checkbox" id="chkFillShape" style="width:16px; height:16px"> Залив
             </label>
 
             <div style="width:1px;height:30px;background:#ccc;margin:0 5px"></div>
             
-            <button class="tool-btn" onclick="setTool('text', this)" title="Текст">A</button>
-            <label class="tool-btn" title="Вставить фото">
-                🖼️ <input type="file" hidden accept="image/*" onchange="loadImg(this)">
-            </label>
+            <button class="tool-btn" onclick="setTool('text', this)">A</button>
+            <label class="tool-btn">🖼️ <input type="file" hidden accept="image/*" onchange="loadImg(this)"></label>
             
             <button class="tool-btn" onclick="undo()">↩️</button>
             <button class="tool-btn" style="color:red" onclick="wipe()">🗑️</button>
-            <button id="btnSubDraw" class="btn btn-accent" style="width:auto; padding:0 20px;" onclick="subDraw()">✔ ГОТОВО</button>
+            <button id="btnSubDraw" class="btn btn-accent" style="width:auto; padding:0 20px;" onclick="subDraw()">✔</button>
         </div>
 
-        <!-- STAMP SETTINGS -->
+        <!-- STAMP UI -->
         <div id="stampControls" class="toolbar hidden" style="margin-top:5px; background:#f1f2f6">
             <input id="txtInput" class="input-std" style="width:150px; padding:5px;" placeholder="Текст..." oninput="updateGhost()">
             <span>Размер:</span>
@@ -253,6 +249,14 @@ const htmlContent = `
         const socket = io();
         let myId, room, isHost=false, isSpec=false;
         
+        // AUTO FILL ROOM FROM URL
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('room')) {
+                document.getElementById('inpRoom').value = urlParams.get('room');
+            }
+        };
+
         // CANVAS
         const cvs = document.getElementById('cvs');
         const ctx = cvs.getContext('2d', {willReadFrequently: true});
@@ -271,10 +275,7 @@ const htmlContent = `
         
         function setColor(c, el) { 
             color=c; 
-            if(el) {
-                document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
-                el.classList.add('active');
-            }
+            if(el) { document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active')); el.classList.add('active'); }
             updateGhost(); 
         }
         
@@ -283,7 +284,6 @@ const htmlContent = `
             document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
             if(el) el.classList.add('active');
             
-            // UI Reset
             document.getElementById('stampControls').classList.add('hidden');
             document.getElementById('ghostElem').style.display = 'none';
             ghostMode = null;
@@ -350,7 +350,6 @@ const htmlContent = `
             };
         }
 
-        // INPUT LISTENERS
         window.addEventListener('mousemove', e => {
             const el = document.getElementById('ghostElem');
             if(ghostMode && el.style.display !== 'none') { el.style.left=e.clientX+'px'; el.style.top=e.clientY+'px'; }
@@ -414,7 +413,6 @@ const htmlContent = `
                     if(shouldFill) ctx.fillRect(startX, startY, w, h);
                     else ctx.strokeRect(startX, startY, w, h);
                 } else if(tool === 'circle') {
-                    // Ellipse
                     ctx.ellipse(startX + w/2, startY + h/2, Math.abs(w/2), Math.abs(h/2), 0, 0, 2 * Math.PI);
                     if(shouldFill) ctx.fill(); else ctx.stroke();
                 }
@@ -441,13 +439,15 @@ const htmlContent = `
             ctx.putImageData(id,0,0);
         }
 
-        // --- GAME LOGIC ---
+        // --- UI & LOGIC ---
         function show(id) { 
             document.querySelectorAll('.panel, #screenDraw').forEach(e=>e.classList.add('hidden')); 
             document.getElementById(id).classList.remove('hidden'); 
             if(id.includes('screen')) document.getElementById(id).style.display = 'flex';
+            
             const h = document.getElementById('gameHeader');
-            if(id === 'screenLobby' || id === 'screenLogin') h.classList.add('hidden');
+            // Hide header in Login only. Show in Lobby, Game, Spec.
+            if(id === 'screenLogin') h.classList.add('hidden');
             else h.classList.remove('hidden');
         }
         
@@ -458,15 +458,20 @@ const htmlContent = `
             else alert("Заполни поля");
         }
         
-        function leaveRoom() { window.location.reload(); }
+        function leaveRoom() { window.location.href = window.location.href.split('?')[0]; }
+        
         function copyLink() { 
-            navigator.clipboard.writeText(\`Заходи в Gartic: Комната \${room}\`);
-            alert("Скопировано!");
+            // FIX: Generate proper URL
+            const url = window.location.protocol + '//' + window.location.host + '/?room=' + room;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Ссылка скопирована: " + url);
+            });
         }
         
         function updSet(key, val) { 
             if(key==='write') document.getElementById('valTimeText').innerText = val;
             if(key==='draw') document.getElementById('valTimeDraw').innerText = val;
+            if(key==='mod') document.getElementById('valPerc').innerText = val+'%';
             socket.emit('set', {room, key, val}); 
         }
 
@@ -478,15 +483,14 @@ const htmlContent = `
             socket.emit('turn', {room, type:'text', data: txt}); 
             document.getElementById('btnSubText').innerText = "ОБНОВИТЬ";
             document.getElementById('btnSubText').classList.add('btn-accent');
-            document.getElementById('txtStatus').innerText = "Принято. Можно изменить пока не кончится время.";
+            document.getElementById('txtStatus').innerText = "Принято. Ждем таймер.";
         }
         
         function subDraw() { 
-            setTool('brush', document.querySelector('.tool-btn')); // reset tool
+            setTool('brush', document.querySelector('.tool-btn')); 
             socket.emit('turn', {room, type:'img', data: cvs.toDataURL('image/jpeg', 0.6)}); 
             const btn = document.getElementById('btnSubDraw');
-            btn.innerText = "ОБНОВИТЬ";
-            btn.classList.remove('btn-accent'); btn.style.background = '#0984e3';
+            btn.innerText = "ОБНОВИТЬ"; btn.classList.remove('btn-accent'); btn.style.background = '#0984e3';
         }
 
         socket.on('joined', d => {
@@ -513,26 +517,24 @@ const htmlContent = `
         socket.on('settings', s => {
              document.getElementById('valTimeText').innerText = s.tWrite;
              document.getElementById('valTimeDraw').innerText = s.tDraw;
+             document.getElementById('valPerc').innerText = s.mod + '%';
              if(isHost) document.getElementById('selGameMode').value = s.gameMode;
-             else document.getElementById('selGameMode').value = s.gameMode; // sync visual
+             else document.getElementById('selGameMode').value = s.gameMode;
         });
 
         socket.on('round', d => {
             if(isSpec) return;
-            
-            // RESET UI
+            // Reset Buttons
             document.getElementById('btnSubText').innerText = "ГОТОВО";
             document.getElementById('btnSubText').classList.remove('btn-accent');
             document.getElementById('txtStatus').innerText = "";
-            document.getElementById('btnSubDraw').innerText = "✔ ГОТОВО";
+            document.getElementById('btnSubDraw').innerText = "✔";
             document.getElementById('btnSubDraw').classList.add('btn-accent');
             document.getElementById('btnSubDraw').style.background = '';
 
-            // Story Mode or Text Round
             if(d.type==='text') {
                 show('screenText');
                 document.getElementById('inpGameText').value = '';
-                
                 if(d.mode === 'story') {
                      document.getElementById('textPrompt').innerText = d.prev ? "ПРОДОЛЖИ ИСТОРИЮ:" : "НАЧНИ ИСТОРИЮ:";
                      document.getElementById('prevDrawContainer').innerHTML = d.prev ? \`<div class="msg msg-l" style="font-size:1.1rem; text-align:left">\${d.prev}</div>\` : '';
@@ -550,8 +552,7 @@ const htmlContent = `
         
         socket.on('timer', t => {
             const el = document.getElementById('lblTimer');
-            el.innerText = t;
-            el.style.background = parseInt(t)<=10 ? 'red' : 'var(--warn)';
+            el.innerText = t; el.style.background = parseInt(t)<=10 ? 'red' : 'var(--warn)';
         });
 
         socket.on('presStart', () => {
@@ -592,7 +593,8 @@ app.get('/', (req,res) => res.send(htmlContent));
 io.on('connection', s => {
     s.on('join', ({name, room}) => {
         s.join(room);
-        if(!rooms[room]) rooms[room] = { id:room, pl:[], state:'lobby', round:0, chains:[], settings:{gameMode:'std', tWrite:60, tDraw:120} };
+        // Default mod is 100%
+        if(!rooms[room]) rooms[room] = { id:room, pl:[], state:'lobby', round:0, chains:[], settings:{gameMode:'std', mod:100, tWrite:60, tDraw:120} };
         const r = rooms[room];
         const isSpec = r.state !== 'lobby';
         r.pl.push({id:s.id, name, isHost: !isSpec && r.pl.length===0, done:false, spectator: isSpec});
@@ -605,6 +607,7 @@ io.on('connection', s => {
         if(rooms[room]) {
             if(key==='write') rooms[room].settings.tWrite = parseInt(val);
             if(key==='draw') rooms[room].settings.tDraw = parseInt(val);
+            if(key==='mod') rooms[room].settings.mod = parseInt(val); // Restore Mod
             if(key==='mode') rooms[room].settings.gameMode = val;
             io.to(room).emit('settings', rooms[room].settings);
         }
@@ -617,11 +620,12 @@ io.on('connection', s => {
         const active = r.pl.filter(p => !p.spectator);
         r.chains = active.map(p=>[]); 
         
-        // Mode Logic
+        // CALC ROUNDS WITH SLIDER %
+        const modMultiplier = r.settings.mod / 100;
         if(r.settings.gameMode === 'story') {
-            r.maxRounds = active.length * 2; // Double rounds for story
+            r.maxRounds = Math.max(2, Math.ceil((active.length * 2) * modMultiplier));
         } else {
-            r.maxRounds = active.length; // Standard
+            r.maxRounds = Math.max(2, Math.ceil(active.length * modMultiplier));
         }
         
         newRound(r);
@@ -713,20 +717,16 @@ function newRound(r) {
     let time = r.settings.tWrite;
     
     if(r.settings.gameMode === 'story') {
-        // Always text
         isText = true;
         time = r.settings.tWrite;
     } else {
-        // Standard: Odd=Text, Even=Draw
         isText = r.round%2 !== 0;
         time = isText ? r.settings.tWrite : r.settings.tDraw;
     }
     
     active.forEach((p, i) => {
-        // Shift chain index
         let chainIdx = (i + (r.round-1)) % active.length;
         p.chainIdx = chainIdx; 
-        
         let prev = null;
         if(r.round > 1) {
             let c = r.chains[chainIdx];
